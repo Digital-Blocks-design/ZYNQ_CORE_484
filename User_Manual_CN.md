@@ -100,15 +100,98 @@ CH224K 使用 Type-C 母口供电，电平配置支持 5/9/12/15/20V（图中电
 
 ![image-20240512032950893](image/image-20240512032950893.png)
 
+### 3.4 电源模块 
+
+采用 TI的型号为 TPS82130SILT的 MicroSiP 电源模块  ，为板上提供 1.0V， 1.5V，1.8V，3.3V，5.0V等多路供电 ；通过 TI 的 TPS51200 生成 DDR3 需要的 VTT 和 VREF 电压。
+
+TPS82130 是一款 17V 输入 3A 降压转换器 MicroSiP 电源模块，经优化具有小解决方案尺寸和高效率等特性。该模块集成了一个同步降压转换器和一个电感器，以简化设计、减少外部元件数量并缩小 PCB 面积。该模块采用紧凑的薄型封装，适合通过标准表面贴装设备进行自动组装。
+
+TPS51200 器件是一款灌电流和拉电流双倍数据速率 (DDR) 终端稳压器，专门针对低输入电压、低成本、低噪声的空间受限型系统而设计。
+
+各个电源分配的功能如下表所示：
+
+| **电源**  | **功能**                                                     |
+| --------- | ------------------------------------------------------------ |
+| +1.0V     | ZYNQ的核心电压                                               |
+| +1.5V     | DDR3 ,  ZYNQ Bank502                                         |
+| +1.8V     | ZYNQ 辅助电压, ZYNQ PLL, ZYNQ Bank501 VCCIO, 以太网，USB2.0 等 |
+| +3.3V     | ZYNQ  VCCIO, 以太网，串口，HDMI ，FLASH,  EEPROM  ，  SD card 等 |
+| +5.0V     | LCD ，HDMI ， 扩展接口                                       |
+| VREF, VTT | DDR3                                                         |
 
 
 
+因为 ZYNQ 的 PS 和 PL 部分的电源有上电顺序的要求，在电路设计中，按照ZYQN 的电源要求设计，上电依次为 1.0V -> 1.5V -> 1.8 V -> 3.3V -> 5.0V 。下图为电源的电路设计：
 
-
+![image-20240512034353881](image/image-20240512034353881.png)
 
 
 
 ## 4，ZYNQ7000
+
+### 4.1 主芯片介绍
+
+开发板使用的是 Xilinx 公司的 Zynq7000 系列的芯片，型号为 XC7Z020-2CLG484I。
+
+zynq7000系列的结构如下图所示。芯片的 PS 系统集成了两个 ARM Cortex™-A9 处理器，AMBA®互连，内部存储器，外部存储器接口和外设，外设主要包括 USB 总线接口，以太网接口，SD/SDIO 接口，I2C 总线接口，CAN 总线接口，UART 接口，GPIO 等。
+
+PL端结构与A7系列相似，大体就包括电源模块、时钟CMT、IO模块（IOB、GTP、memory interface、pcie）、CLB、BRAM、GTP、DSP、jtag调试口等。
+
+PS端包含1个APU单元，APU内有两个cotex-a9核用于运算，一个SCU用于处理数据的一致性，然后包含L1、L2级缓存，一个GIC用于中断控制，一个256KB SRAM用于程序运行，另外包含TTC、看门狗、DAP调试口等。PS端还包含一个Central Interconnect，用于互连IOP（CAN、SPI、UART、SD、USB、ETHERNET等外设），互连flash，互连DDR，互连OCM Interconnect。PS端还包含clock生成模块、复位模块等。
+
+![img](image/20210430144218677.png)
+
+### 4.2 ZYNQ7000命名规则
+
+Zynq其命名规则遵循一定的规则和约定。型号由系列代号，数字序列，速度等级，封装类型，温度等级等部分组成， 例如，Zynq-7000系列包括Zynq-7010、Zynq-7020、Zynq-7030、Zynq-7040、Zynq-7100、等型号，其中数字和字母的组合表示不同的芯片性能等级，速度等级包括 -1 ，-L1，-2 ，-L2，-3等，温度等级支持商业级，工艺级等。详细内容见于下图 ：
+
+![image-20240512041009862](image/image-20240512041009862.png)
+
+### 4.3 芯片资源
+
+**PS 系统部分的主要参数如下：**
+
+- 基于 ARM 双核 CortexA9 的应用处理器
+- 每个 CPU 32KB 1 级指令和数据缓存，512KB 2 级缓存 2 个 CPU 共享
+- 片上 boot ROM 和 256KB 片内 RAM
+- 外部存储接口，支持 16/32 bit DDR2、DDR3 接口
+- 两个千兆网卡支持：发散-聚集 DMA ，GMII，RGMII，SGMII 接口
+- 两个 USB2.0 OTG 接口，每个最多支持 12 节点
+- 两个 CAN2.0B 总线接口
+- 两个 SD 卡、SDIO、MMC 兼容控制器
+- 2 个 SPI，2 个 UARTs，2 个 I2C 接口
+- 4 组 32bit GPIO，54（32+22）作为 PS 系统 IO，64 连接到 PL
+- PS 内和 PS 到 PL 的高带宽连接
+
+**PL 逻辑部分的主要参数如下：**
+
+- 逻辑单元 Logic Cells：85K
+- 查找表 LUTs: 53,200
+- 触发器(flip-flops): 106,400
+- 乘法器 18x25MACCs：220
+- Block RAM：4.9 Mb
+- 两个 AD 转换器,可以测量片上电压、温度感应和高达 17 外部差分输入通道，最大转换速率为1MBPS
+
+## 4.4 各bank电压
+
+该主芯片的各个BANK功能以及BANK描述如下 ：
+
+![image-20240512035933361](image/image-20240512035933361.png)
+
+ FPGA的器件管脚按照Bank进行划分，每个Bank独立供电，以使FPGA I/O适应不同电压标准，增强I/O设计的灵活性。主芯片各个板卡的设计如下表：
+
+| BANK    | 设计电压 | 备注             |
+| ------- | -------- | ---------------- |
+| BANK0   | 3.3V     | 配置BNAK         |
+| BANK13  | 3.3V     | PL_IO ,  HR BANK |
+| BANK33  | 3.3V     | PL_IO ,  HR BANK |
+| BANK34  | 3.3V     | PL_IO ,  HR BANK |
+| BANK35  | 3.3V     | PL_IO ,  HR BANK |
+| BANK500 | 3.3V     | PS_MIO           |
+| BANK501 | 1.8V     | PS_MIO           |
+| BANK502 | 1.5V     | PS_DDR           |
+
+
 
 ## 5，PS端外设
 
