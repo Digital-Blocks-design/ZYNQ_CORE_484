@@ -72,7 +72,7 @@
 
 ### 3.1 电源输入
 
-采用USB TYPE-C电源输入为板卡供电，LED9为电源输入指示灯 ，当电源输入有效时，LED9点亮 。
+采用USB TYPE-C电源输入为板卡供电，供电的USB连接器位号为 J21，LED9为电源输入指示灯 ，当电源输入有效时，LED9点亮 。
 
 ![](image/image-20240512031732938.png)
 
@@ -125,6 +125,16 @@ TPS51200 器件是一款灌电流和拉电流双倍数据速率 (DDR) 终端稳�
 
 ![image-20240512034353881](image/image-20240512034353881.png)
 
+### 3.5 **FPGA供电系统**
+
+ZYNQ 芯片的电源分 PS 系统部分和 PL逻辑部分，两部分的电源分别是独立工作。PS 系统部分的电源和 PL 逻辑部分的电源都有上电
+顺序，不正常的上电顺序可能会导致 ARM 系统和 FPGA 系统无法正常工作。
+
+PS 部分的电源有 VCCPINT、VCCPAUX、VCCPLL 和 PS VCCO。VCCPINT 为 PS 内核供电引脚，接 1.0V；VCCPAUX 为 PS 系统辅助供电引脚，接 1.8V；VCCPLL 为 PS 的内部时钟PLL 的电源供电引脚，也接 1.8V；PS VCCO 为 BANK 的电压，包含 VCCO_MIO0，CCO_MIO1
+和 VCCO_DDR，根据连接的外设不同，连接的电源电源也会不同，在该核心板上，VCC_MIO0 连接 3.3V， VCCO_MIO1 连接 1.8V，VCCO_DDR 连接 1.5V。PS 系统要求上电顺序分别为先 VCCPINT 供电，然后 VCCPAUX 和 VCCPLL，最后为 PS VCCO。断电的顺序则相反。
+
+PL 部分的电源有 VCCINT, VCCBRAM, VCCAUX 和 VCCO。VCCPINT 为 FPGA 内核供电引脚，接 1.0V；VCCBRAM 为 FPGA Block RAM 的供电引脚；接 1.0V；VCCAUX 为 FPGA辅助供电引脚, 接 1.8V；VCCO 为 PL 的各个 BANK 的电压，包含 BANK13，BANK34，BANK35，在 AX7020 开发板上，BANK 的电压连接 3.3V。PL 系统要求上电顺序分别为先VCCINT 供电，再是 VCCBRAM, 然后是 VCCAUX，最后为 VCCO。如果 VCCINT 和 VCCBRAM的电压一样，可以同时上电。断电的顺序则相反。
+
 
 
 ## 4，ZYNQ7000
@@ -172,7 +182,7 @@ Zynq其命名规则遵循一定的规则和约定。型号由系列代号，数�
 - Block RAM：4.9 Mb
 - 两个 AD 转换器,可以测量片上电压、温度感应和高达 17 外部差分输入通道，最大转换速率为1MBPS
 
-## 4.4 各bank电压
+### 4.4 各bank电压
 
 该主芯片的各个BANK功能以及BANK描述如下 ：
 
@@ -191,11 +201,160 @@ Zynq其命名规则遵循一定的规则和约定。型号由系列代号，数�
 | BANK501 | 1.8V     | PS_MIO           |
 | BANK502 | 1.5V     | PS_DDR           |
 
+### 4.5  调试接口 
+
+板卡集成由一路 USB JTAG 口，集成有JTAG和UART功能，通过 USB 线及板载的 JTAG 电路对 ZYNQ 系统进行调试和下载，无需外置仿真器和串口调试器。用户无需购买额外的下载器，只要一根 USB 线就能进行 ZYNQ 的开发和调试了，调试的USB接口位号为 J8 。
+
+通过 FT2232H 提供JTAG和UART支持 。FT2232H是一个USB2.0高速（每秒480兆位）至UART/FIFO 芯片。 具有在多种工业标准串行或并行接口配置的能力。有两个多协议同步串行引擎（MPSSE）允许使用JTAG，I2C和SPI两个通道同时进行通信。多协议同步串行引擎 (MPSSE) 是某些 FTDI 客户端 IC 的一项功能，允许模拟多种同步串行协议，包括 SPI、I2C 和 JTAG。![image-20240512042305806](image/image-20240512042305806.png)
+
+## 5，时钟配置
+
+板上分别为 PS 系统和 PL 逻辑部分提供了有源时钟， PS 系统和 PL 逻辑可以单独工作。
+
+### **5.1 PS**系统时钟源**
+
+ZYNQ 芯片通过开发板上的 X1 晶振为 PS 部分提供 33.333MHz 的时钟输入，3.3V 供电。时钟的输入连接到 ZYNQ 芯片的 BANK500 的 PS_CLK_500 的管脚上。其原理图如图 所示：
+
+![image-20240512043522489](image/image-20240512043522489.png)
+
+**时钟引脚分配：**
+
+| **信号名称**   | **ZYNQ 引脚** |
+| -------------- | ------------- |
+| **PS_CLK_500** | F7            |
+
+### **5.2 PL系统时钟源**
+
+板上提供了单端 50MHz 的 PL 系统时钟源，3.3V 供电。晶振输出连接到FPGA 的全局时钟(MRCC)，这个 GCLK 可以用来驱动 FPGA 内的用户逻辑电路。该时钟源的原理图如图所示
+
+![image-20240512043647943](image/image-20240512043647943.png)
+
+**时钟引脚分配：**
+
+| **信号名称**     | **ZYNQ 引脚** |
+| ---------------- | ------------- |
+| **FPGA_CLK_50M** | Y19           |
 
 
-## 5，PS端外设
 
-## 6，PL端外设
+## 6，PS端设计
+
+### 6.1 启动模式
+
+板卡支持三种启动模式。这三种启动模式分别是 JTAG 调试模式,QSPI FLASH 和 SD 卡启动模式。ZYNQ 芯片上电后会检测响应 MIO 口的电平来决定那种启动模式。用户可以通过核心板上的跳线来选择不同的启动模式 。
+
+![image-20240512044009065](image/image-20240512044009065.png)
+
+### 6.2 QSPI  FLASH
+
+开发板配有一片 256Mbit 大小的 Quad-SPI FLASH 芯片，型号为 N25Q128A13ESE40F ，它使用3.3V CMOS 电压标准。由于 QSPI FLASH 的非易失特性，在使用中， 它可以作为系统的启动设备来存储系统的启动镜像。这些镜像主要包括 FPGA 的 bit 文件、ARM 的应用程序代码以及其它的用户数据文件。
+
+SPI FLASH 连接到 ZYNQ 芯片的 PS 部分 BANK500 的 GPIO 口上，在系统设计中需要配置这些 PS 端的 GPIO 口功能为 QSPI FLASH 接口。
+
+![image-20240512044543849](image/image-20240512044543849.png)
+
+**![image-20240512044720236](image/image-20240512044720236.png)**
+
+
+
+**配置芯片引脚分配：**
+
+| 信号名称     | ZYNQ 引脚名 | ZYNQ 引脚号 |
+| ------------ | ----------- | ----------- |
+| **QSPI_CS**  | PS_MIO1_500 | A1          |
+| **QSPI_D0**  | PS_MIO2_500 | A2          |
+| **QSPI_D1**  | PS_MIO3_500 | F6          |
+| **QSPI_D2**  | PS_MIO4_500 | E4          |
+| **QSPI_D3**  | PS_MIO5_500 | A3          |
+| **QSPI_CLK** | PS_MIO6_500 | A4          |
+
+### 6.3 EMMC 
+
+板配有一片大容量的 8GB 大小的 eMMC FLASH 芯片，型号为MTFC8GAKAJCN-4M，它支持 JEDEC e-MMC V5.0 标准的 HS-MMC 接口，电平支持 1.8V或者 3.3V。eMMC FLASH 和 ZYNQ 连接的数据宽度为 4bit。
+
+由于 eMMC FLASH 的大容量和非易失特性，在 ZYNQ 系统使用中，它可以作为系统大容量的存储设备，比如存储 ARM 的应用程序、系统文件以及其它的用户数据文件。
+
+EMMC 连接到了 ZYNQ 的 PS 端接口，接口采用 SD 模式。EMMC 具备体积小，容量大，使用方便，速度快等优点，数据时钟可以达到 50MHZ。由于直接焊接在板上，因此可以在震动或者环境相对恶劣的场合使用。
+
+eMMC FLASH 连接到 ZYNQ UltraScale+的 PS 部分 BANK500 的 GPIO 口上，在系统设计中需要配置这些 PS 端的 GPIO 口功能为 EMMC 接口。
+
+EMMC 的电路设计如下：
+
+![image-20240512052015687](image/image-20240512052015687.png)
+
+**EMMC 的参数如下:**
+
+- 芯片类型:MTFC8GAKAJCN-4M
+- 容量:8G Byte  
+- 厂家:Micron
+
+**EMMC芯片引脚分配：**
+
+| 信号名称       | ZYNQ 引脚名 | ZYNQ 引脚号 |
+| -------------- | ----------- | ----------- |
+| SD1_EMMC_DATA0 | PS_MIO10    | G7          |
+| SD1_EMMC_DATA1 | PS_MIO13    | A6          |
+| SD1_EMMC_DATA2 | PS_MIO14    | B6          |
+| SD1_EMMC_DATA3 | PS_MIO15    | E6          |
+| SD1_EMMC_CLK   | PS_MIO12    | C5          |
+| SD1_EMMC_CMD   | PS_MIO11    | B4          |
+| SD1_EMMC_RST   | PS_MIO9     | C4          |
+
+### 6.4 以太网 
+
+板上通过 Realtek RTL8211E-VL 以太网 PHY 芯片用户提供网络通信服务。
+
+RTL8211E是Realtek瑞昱推出的一款高集成的网络接收PHY芯片，它符合10Base-T，100Base-TX和1000Base-T IEEE802.3标准，该芯片在网络通信中属于物理层，用于MAC与PHY之间的数据通信。目前有RTL8211E-VB-CG、RTL8211E-VL-CG、RTL8211EG-VB-CG等三个版本。 
+
+以太网 PHY 芯片是连接到 ZYNQ 的 PS 端 BANK501 的 GPIO 接口上。RTL8211E-VL 芯片支持 10/100/1000 Mbps 网络传输速率，通过 RGMII 接口跟 Zynq7000 PS 系统的 MAC 层进行数据通信。RTL8211E-VL 支持ＭDI/MDX 自适应，各种速度自适应，Master/Slave 自适应，支持 MDIO 总线进行 PHY 的寄存器管理。
+
+RTL8211E的电路设计如下：
+
+![image-20240512052108027](image/image-20240512052108027.png)
+
+RTL8211E-VL 上电会检测一些特定的 IO 的电平状态，从而确定自己的工作模式。配置电路以及配置项如下图所示：
+
+![image-20240512045723383](image/image-20240512045723383.png)
+
+ 当网络连接到千兆以太网时，FPGA 和 PHY 芯片 RTL8211E-VL 的数据传输时通过 RGMII总线通信，传输时钟为 125Mhz，数据在时钟的上升沿和下降样采样。
+
+当网络连接到百兆以太网时，FPGA 和 PHY 芯片 RTL8211E-VL 的数据传输时通过 RMII总线通信，传输时钟为 25Mhz。数据在时钟的上升沿和下降样采样。
+
+
+
+**以太网引脚分配如下：**
+
+| 信号名称  | ZYNQ 引脚名  | ZYNQ 引脚号 | 备注             |
+| --------- | ------------ | ----------- | ---------------- |
+| ETH_GCLK  | PS_MIO16_501 | D6          | RGMII 发送时钟   |
+| ETH_TXD0  | PS_MIO17_501 | E9          | 发送数据 bit０   |
+| ETH_TXD1  | PS_MIO18_501 | A7          | 发送数据 bit1    |
+| ETH_TXD2  | PS_MIO19_501 | E10         | 发送数据 bit2    |
+| ETH_TXD3  | PS_MIO20_501 | A8          | 发送数据 bit3    |
+| ETH_TXCTL | PS_MIO21_501 | F11         | 发送使能信号     |
+| ETH_RXCK  | PS_MIO22_501 | A14         | RGMII 接收时钟   |
+| ETH_RXD0  | PS_MIO23_501 | E11         | 接收数据 Bit0    |
+| ETH_RXD1  | PS_MIO24_501 | B7          | 接收数据 Bit1    |
+| ETH_RXD2  | PS_MIO25_501 | F12         | 接收数据 Bit2    |
+| ETH_RXD3  | PS_MIO26_501 | A13         | 接收数据 Bit3    |
+| ETH_RXCTL | PS_MIO27_501 | D7          | 接收数据有效信号 |
+| ETH_MDC   | PS_MIO52_501 | D10         | MDIO 管理时钟    |
+| ETH_MDIO  | PS_MIO53_501 | C12         | MDIO 管理数据    |
+
+### 6.5 DDR
+
+
+
+### 6.6 SD 卡
+
+板包含了一个Micro型的SD卡接口，以提供用户访问SD卡存储器，用于存储ZYNQ芯片的BOOT程序，Linux操作系统内核, 文件系统以及其它的用户数据文件。
+SDIO信号与ZYNQ的PS BANK501的IO信号相连，因为该BANK的VCCMIO设置为1.8V，但SD卡的数据电平为3.3V, 我们这里通过 MAX13035EETE+ 电平转换器来连接。
+
+SD卡的电路设计如下：
+
+![image-20240512052159175](image/image-20240512052159175.png)
+
+## 7，PL端外设
 
 ### 扩展口
 
@@ -325,3 +484,4 @@ ESD防护芯片具有静电和浪涌保护功能，选用型号为：RCLAMP0524P
 | PIN39  |  VCC3V3  |     -      |     -      | 3.3V电源输出         |
 | PIN40  |  VCC3V3  |     -      |     -      | 3.3V电源输出         |
 
+## 8，板卡接口汇总
