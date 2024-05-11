@@ -239,11 +239,15 @@ ZYNQ 芯片通过开发板上的 X1 晶振为 PS 部分提供 33.333MHz 的时�
 
 ## 6，PS端设计
 
-### 6.1 启动模式
+### 6.1 启动模式配置
 
 板卡支持三种启动模式。这三种启动模式分别是 JTAG 调试模式,QSPI FLASH 和 SD 卡启动模式。ZYNQ 芯片上电后会检测响应 MIO 口的电平来决定那种启动模式。用户可以通过核心板上的跳线来选择不同的启动模式 。
 
 ![image-20240512044009065](image/image-20240512044009065.png)
+
+ZYNQ7000 完整的启动模式MIO配置如下表 （节选自UG585）：
+
+![image-20240512052900589](image/image-20240512052900589.png)
 
 ### 6.2 QSPI  FLASH
 
@@ -259,14 +263,14 @@ SPI FLASH 连接到 ZYNQ 芯片的 PS 部分 BANK500 的 GPIO 口上，在系统
 
 **配置芯片引脚分配：**
 
-| 信号名称     | ZYNQ 引脚名 | ZYNQ 引脚号 |
-| ------------ | ----------- | ----------- |
-| **QSPI_CS**  | PS_MIO1_500 | A1          |
-| **QSPI_D0**  | PS_MIO2_500 | A2          |
-| **QSPI_D1**  | PS_MIO3_500 | F6          |
-| **QSPI_D2**  | PS_MIO4_500 | E4          |
-| **QSPI_D3**  | PS_MIO5_500 | A3          |
-| **QSPI_CLK** | PS_MIO6_500 | A4          |
+| 信号名称        | ZYNQ 引脚名 | ZYNQ 引脚号 |
+| --------------- | ----------- | ----------- |
+| PS_CFG_SPI_CS   | PS_MIO1_500 | A1          |
+| PS_CFG_SPI_DQ0  | PS_MIO2_500 | A2          |
+| PS_CFG_SPI_DQ1  | PS_MIO3_500 | F6          |
+| PS_CFG_SPI_DQ2  | PS_MIO4_500 | E4          |
+| PS_CFG_SPI_DQ3  | PS_MIO5_500 | A3          |
+| PS_CFG_SPI_SCLK | PS_MIO6_500 | A4          |
 
 ### 6.3 EMMC 
 
@@ -343,7 +347,13 @@ RTL8211E-VL 上电会检测一些特定的 IO 的电平状态，从而确定自�
 
 ### 6.5 DDR
 
+板上配有两个的4Gbit（512MB）的DDR3芯片(共计8Gbit),型号为 MT41K256M16TW-107IT 。DDR的总线宽度共为32bit。该DDR3存储系统直接连接到了ZYNQ处理系统（PS）的BANK 502的存储器接口上。
 
+DDR3 的硬件设计需要严格考虑信号完整性，在电路设计和 PCB 设计的时候已经充分考虑了匹配电阻/终端电阻,走线阻抗控制，走线等长控制， 保证 DDR3 的高速稳定的工作。
+
+DDR的电路设计如下图 ：
+
+![image-20240512052551500](image/image-20240512052551500.png)
 
 ### 6.6 SD 卡
 
@@ -354,7 +364,45 @@ SD卡的电路设计如下：
 
 ![image-20240512052159175](image/image-20240512052159175.png)
 
+**SD 卡槽引脚分配**
+
+| 信号名称       | ZYNQ 引脚名 | ZYNQ 引脚号 | 备注         |
+| -------------- | ----------- | ----------- | ------------ |
+| SD0_SDIO_CLK   | PS_MIO28    | A12         | SD时钟信号   |
+| SD0_SDIO_CMD   | PS_MIO29    | E8          | SD命令信号   |
+| SD0_SDIO_D0    | PS_MIO30    | A11         | SD数据Data0  |
+| SD0_SDIO_DATA1 | PS_MIO31    | F9          | SD数据Data1  |
+| SD0_SDIO_DATA2 | PS_MIO32    | C7          | SD数据Data2  |
+| SD0_SDIO_DATA3 | PS_MIO33    | G13         | SD数据Data3  |
+| SD0_SDIO_CATAD | PS_MIO34    | B12         | SD卡插入信号 |
+
+### 6.7 USB
+
+板卡使用的USB2.0收发器是一个1.8V的，高速的支持ULPI标准接口的USB3320C-EZK。ZYNQ的USB总线接口和USB3320C-EZK收发器相连接，实现高速的USB2.0 Host模式和Slave模式的数据通信。USB3320C的USB的数据和控制信号连接到ZYNQ芯片PS端的BANK501的IO口上 。
+
+**USB2.0 引脚分配 ：**
+
+| 信号名称   | ZYNQ 引脚名 | ZYNQ 引脚号 | 备注             |
+| ---------- | ----------- | ----------- | ---------------- |
+| OTG_DATA4  | PS_MIO40    | E14         | USB 数据 Bit4    |
+| OTG_DIR    | PS_MIO41    | C8          | USB 数据方向信号 |
+| OTG_STP    | PS_MIO42    | D8          | USB 停止信号     |
+| OTG_NXT    | PS_MIO43    | B11         | USB 下一数据信号 |
+| OTG_DATA0  | PS_MIO44    | E13         | USB 数据 Bit0    |
+| OTG_DATA1  | PS_MIO45    | B9          | USB 数据 Bit1    |
+| OTG_DATA2  | PS_MIO46    | D12         | USB 数据 Bit2    |
+| OTG_DATA3  | PS_MIO47    | B10         | USB 数据 Bit3    |
+| OTG_CLK    | PS_MIO48    | D11         | USB 时钟信号     |
+| OTG_DATA5  | PS_MIO49    | C14         | USB 数据 Bit5    |
+| OTG_DATA6  | PS_MIO50    | D13         | USB 数据 Bit6    |
+| OTG_DATA7  | PS_MIO51    | C10         | USB 数据 Bit7    |
+| OTG_RESETN | PS_MIO39    | C13         | USB 复位信号     |
+
 ## 7，PL端外设
+
+
+
+
 
 ### 扩展口
 
