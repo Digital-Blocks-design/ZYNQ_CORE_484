@@ -49,7 +49,9 @@
 
 - 一片IIC接口的温度传感器芯片，可用于检测环境温度。
 
-- LCD屏幕接口，采用RGB888时序接口，支持显示屏幕 。
+- LCD屏幕接口，采用RGB888时序接口，支持显示屏幕 以及触摸功能。
+
+- 板卡设计有OLCD屏幕接口，采用IIC接口，支持简单内容的显示。
 
 - 一路风扇控制接口，12V供电，支持PWM风扇调速 。
 
@@ -197,7 +199,7 @@ Zynq其命名规则遵循一定的规则和约定。型号由系列代号，数�
 | BANK13  | 3.3V     | PL_IO ,  HR BANK |
 | BANK33  | 3.3V     | PL_IO ,  HR BANK |
 | BANK34  | 3.3V     | PL_IO ,  HR BANK |
-| BANK35  | 3.3V     | PL_IO ,  HR BANK |
+| BANK35  | 1.8V     | PL_IO ,  HR BANK |
 | BANK500 | 3.3V     | PS_MIO           |
 | BANK501 | 1.8V     | PS_MIO           |
 | BANK502 | 1.5V     | PS_DDR           |
@@ -212,7 +214,7 @@ Zynq其命名规则遵循一定的规则和约定。型号由系列代号，数�
 
 板上分别为 PS 系统和 PL 逻辑部分提供了有源时钟， PS 系统和 PL 逻辑可以单独工作。
 
-### **5.1 PS**系统时钟源**
+### **5.1 PS**系统时钟源
 
 ZYNQ 芯片通过开发板上的 X1 晶振为 PS 部分提供 33.333MHz 的时钟输入，3.3V 供电。时钟的输入连接到 ZYNQ 芯片的 BANK500 的 PS_CLK_500 的管脚上。其原理图如图 所示：
 
@@ -232,9 +234,9 @@ ZYNQ 芯片通过开发板上的 X1 晶振为 PS 部分提供 33.333MHz 的时�
 
 **时钟引脚分配：**
 
-| **信号名称**     | **ZYNQ 引脚** |
-| ---------------- | ------------- |
-| **FPGA_CLK_50M** | Y19           |
+| **信号名称** | ZYNQ 引脚 | ZYNQ IO 电平 |
+| ------------ | --------- | ------------ |
+| FPGA_CLK_50M | Y19       | 3.3V         |
 
 
 
@@ -264,14 +266,14 @@ SPI FLASH 连接到 ZYNQ 芯片的 PS 部分 BANK500 的 GPIO 口上，在系统
 
 **配置芯片引脚分配：**
 
-| 信号名称        | ZYNQ 引脚名 | ZYNQ 引脚号 |
-| --------------- | ----------- | ----------- |
-| PS_CFG_SPI_CS   | PS_MIO1_500 | A1          |
-| PS_CFG_SPI_DQ0  | PS_MIO2_500 | A2          |
-| PS_CFG_SPI_DQ1  | PS_MIO3_500 | F6          |
-| PS_CFG_SPI_DQ2  | PS_MIO4_500 | E4          |
-| PS_CFG_SPI_DQ3  | PS_MIO5_500 | A3          |
-| PS_CFG_SPI_SCLK | PS_MIO6_500 | A4          |
+| 信号名称        | ZYNQ 引脚名 | ZYNQ 引脚号 | ZYNQ IO 电平 |
+| --------------- | ----------- | ----------- | ------------ |
+| PS_CFG_SPI_CS   | PS_MIO1_500 | A1          | 3.3V         |
+| PS_CFG_SPI_DQ0  | PS_MIO2_500 | A2          | 3.3V         |
+| PS_CFG_SPI_DQ1  | PS_MIO3_500 | F6          | 3.3V         |
+| PS_CFG_SPI_DQ2  | PS_MIO4_500 | E4          | 3.3V         |
+| PS_CFG_SPI_DQ3  | PS_MIO5_500 | A3          | 3.3V         |
+| PS_CFG_SPI_SCLK | PS_MIO6_500 | A4          | 3.3V         |
 
 ### 6.3 EMMC 
 
@@ -281,7 +283,7 @@ SPI FLASH 连接到 ZYNQ 芯片的 PS 部分 BANK500 的 GPIO 口上，在系统
 
 EMMC 连接到了 ZYNQ 的 PS 端接口，接口采用 SD 模式。EMMC 具备体积小，容量大，使用方便，速度快等优点，数据时钟可以达到 50MHZ。由于直接焊接在板上，因此可以在震动或者环境相对恶劣的场合使用。
 
-eMMC FLASH 连接到 ZYNQ UltraScale+的 PS 部分 BANK500 的 GPIO 口上，在系统设计中需要配置这些 PS 端的 GPIO 口功能为 EMMC 接口。
+eMMC FLASH 连接到 ZYNQ 的 PS 部分 BANK500 的 GPIO 口上，在系统设计中需要配置这些 PS 端的 GPIO 口功能为 EMMC 接口。
 
 EMMC 的电路设计如下：
 
@@ -295,15 +297,17 @@ EMMC 的电路设计如下：
 
 **EMMC芯片引脚分配：**
 
-| 信号名称       | ZYNQ 引脚名 | ZYNQ 引脚号 |
-| -------------- | ----------- | ----------- |
-| SD1_EMMC_DATA0 | PS_MIO10    | G7          |
-| SD1_EMMC_DATA1 | PS_MIO13    | A6          |
-| SD1_EMMC_DATA2 | PS_MIO14    | B6          |
-| SD1_EMMC_DATA3 | PS_MIO15    | E6          |
-| SD1_EMMC_CLK   | PS_MIO12    | C5          |
-| SD1_EMMC_CMD   | PS_MIO11    | B4          |
-| SD1_EMMC_RST   | PS_MIO9     | C4          |
+| 信号名称       | ZYNQ 引脚名 | ZYNQ 引脚号 | ZYNQ IO 电平 |
+| -------------- | ----------- | ----------- | ------------ |
+| SD1_EMMC_DATA0 | PS_MIO10    | G7          | 3.3V         |
+| SD1_EMMC_DATA1 | PS_MIO13    | A6          | 3.3V         |
+| SD1_EMMC_DATA2 | PS_MIO14    | B6          | 3.3V         |
+| SD1_EMMC_DATA3 | PS_MIO15    | E6          | 3.3V         |
+| SD1_EMMC_CLK   | PS_MIO12    | C5          | 3.3V         |
+| SD1_EMMC_CMD   | PS_MIO11    | B4          | 3.3V         |
+| SD1_EMMC_RST   | PS_MIO9     | C4          | 3.3V         |
+
+
 
 ### 6.4 以太网 
 
@@ -325,26 +329,24 @@ RTL8211E-VL 上电会检测一些特定的 IO 的电平状态，从而确定自�
 
 当网络连接到百兆以太网时，FPGA 和 PHY 芯片 RTL8211E-VL 的数据传输时通过 RMII总线通信，传输时钟为 25Mhz。数据在时钟的上升沿和下降样采样。
 
-
-
 **以太网引脚分配如下：**
 
-| 信号名称  | ZYNQ 引脚名  | ZYNQ 引脚号 | 备注             |
-| --------- | ------------ | ----------- | ---------------- |
-| ETH_GCLK  | PS_MIO16_501 | D6          | RGMII 发送时钟   |
-| ETH_TXD0  | PS_MIO17_501 | E9          | 发送数据 bit０   |
-| ETH_TXD1  | PS_MIO18_501 | A7          | 发送数据 bit1    |
-| ETH_TXD2  | PS_MIO19_501 | E10         | 发送数据 bit2    |
-| ETH_TXD3  | PS_MIO20_501 | A8          | 发送数据 bit3    |
-| ETH_TXCTL | PS_MIO21_501 | F11         | 发送使能信号     |
-| ETH_RXCK  | PS_MIO22_501 | A14         | RGMII 接收时钟   |
-| ETH_RXD0  | PS_MIO23_501 | E11         | 接收数据 Bit0    |
-| ETH_RXD1  | PS_MIO24_501 | B7          | 接收数据 Bit1    |
-| ETH_RXD2  | PS_MIO25_501 | F12         | 接收数据 Bit2    |
-| ETH_RXD3  | PS_MIO26_501 | A13         | 接收数据 Bit3    |
-| ETH_RXCTL | PS_MIO27_501 | D7          | 接收数据有效信号 |
-| ETH_MDC   | PS_MIO52_501 | D10         | MDIO 管理时钟    |
-| ETH_MDIO  | PS_MIO53_501 | C12         | MDIO 管理数据    |
+| 信号名称  | ZYNQ 引脚名  | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注             |
+| --------- | ------------ | ----------- | ------------ | ---------------- |
+| ETH_GCLK  | PS_MIO16_501 | D6          | 1.8V         | RGMII 发送时钟   |
+| ETH_TXD0  | PS_MIO17_501 | E9          | 1.8V         | 发送数据 bit０   |
+| ETH_TXD1  | PS_MIO18_501 | A7          | 1.8V         | 发送数据 bit1    |
+| ETH_TXD2  | PS_MIO19_501 | E10         | 1.8V         | 发送数据 bit2    |
+| ETH_TXD3  | PS_MIO20_501 | A8          | 1.8V         | 发送数据 bit3    |
+| ETH_TXCTL | PS_MIO21_501 | F11         | 1.8V         | 发送使能信号     |
+| ETH_RXCK  | PS_MIO22_501 | A14         | 1.8V         | RGMII 接收时钟   |
+| ETH_RXD0  | PS_MIO23_501 | E11         | 1.8V         | 接收数据 Bit0    |
+| ETH_RXD1  | PS_MIO24_501 | B7          | 1.8V         | 接收数据 Bit1    |
+| ETH_RXD2  | PS_MIO25_501 | F12         | 1.8V         | 接收数据 Bit2    |
+| ETH_RXD3  | PS_MIO26_501 | A13         | 1.8V         | 接收数据 Bit3    |
+| ETH_RXCTL | PS_MIO27_501 | D7          | 1.8V         | 接收数据有效信号 |
+| ETH_MDC   | PS_MIO52_501 | D10         | 1.8V         | MDIO 管理时钟    |
+| ETH_MDIO  | PS_MIO53_501 | C12         | 1.8V         | MDIO 管理数据    |
 
 ### 6.5 DDR
 
@@ -367,15 +369,15 @@ SD卡的电路设计如下：
 
 **SD 卡槽引脚分配**
 
-| 信号名称       | ZYNQ 引脚名 | ZYNQ 引脚号 | 备注         |
-| -------------- | ----------- | ----------- | ------------ |
-| SD0_SDIO_CLK   | PS_MIO28    | A12         | SD时钟信号   |
-| SD0_SDIO_CMD   | PS_MIO29    | E8          | SD命令信号   |
-| SD0_SDIO_D0    | PS_MIO30    | A11         | SD数据Data0  |
-| SD0_SDIO_DATA1 | PS_MIO31    | F9          | SD数据Data1  |
-| SD0_SDIO_DATA2 | PS_MIO32    | C7          | SD数据Data2  |
-| SD0_SDIO_DATA3 | PS_MIO33    | G13         | SD数据Data3  |
-| SD0_SDIO_CATAD | PS_MIO34    | B12         | SD卡插入信号 |
+| 信号名称       | ZYNQ 引脚名 | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注         |
+| -------------- | ----------- | ----------- | ------------ | ------------ |
+| SD0_SDIO_CLK   | PS_MIO28    | A12         | 1.8V         | SD时钟信号   |
+| SD0_SDIO_CMD   | PS_MIO29    | E8          | 1.8V         | SD命令信号   |
+| SD0_SDIO_D0    | PS_MIO30    | A11         | 1.8V         | SD数据Data0  |
+| SD0_SDIO_DATA1 | PS_MIO31    | F9          | 1.8V         | SD数据Data1  |
+| SD0_SDIO_DATA2 | PS_MIO32    | C7          | 1.8V         | SD数据Data2  |
+| SD0_SDIO_DATA3 | PS_MIO33    | G13         | 1.8V         | SD数据Data3  |
+| SD0_SDIO_CATAD | PS_MIO34    | B12         | 1.8V         | SD卡插入信号 |
 
 ### 6.7 USB
 
@@ -401,11 +403,191 @@ SD卡的电路设计如下：
 
 ## 7，PL端外设
 
+### 7.1 LED 
+
+板卡设计有4 个用户发光二极管 LED，包括2个单色LED和2个RBG LED ，均连接在PL端进行控制 ; 
+
+LED通过 TXS0108 电平转换芯片连接到FPGA的引脚 ， FPGA一侧的的IO电压为1.8V。当FPGA的IO电平为低时，LED点亮。
+
+LED灯的电路设计如下 ;
+
+![image-20240512150821453](image/image-20240512150821453.png)
+
+**LED的 引脚分配 ：**
+
+| 信号名称  | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注               |
+| --------- | ----------- | ------------ | ------------------ |
+| PL_LED0   | B20         | 1.8V         | 单色LED0           |
+| PL_LED1   | B21         | 1.8V         | 单色LED1           |
+| PL_LED_R0 | A22         | 1.8V         | RGB_LED0的红色控制 |
+| PL_LED_G0 | A21         | 1.8V         | RGB_LED0的绿色控制 |
+| PL_LED_B0 | B22         | 1.8V         | RGB_LED0的蓝色控制 |
+| PL_LED_R1 | E20         | 1.8V         | RGB_LED1的红色控制 |
+| PL_LED_G1 | D21         | 1.8V         | RGB_LED1的绿色控制 |
+| PL_LED_B1 | E21         | 1.8V         | RGB_LED1的蓝色控制 |
+
+### 7.2 按键
+
+板卡设计有 2 个 PL 控制按键 ,连接在PL端 , FPGA一侧的的IO电压为1.8V ，当按键按下时，FPGA侧检测到高电平，按键松开时，检测到低电平。按键的电路设计如下：
+
+![image-20240512151141216](image/image-20240512151141216.png)
+
+**按键的引脚分配如下：**
+
+| 信号名称   | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注 |
+| ---------- | ----------- | ------------ | ---- |
+| PL_BUTTON0 | C19         | 1.8V         |      |
+| PL_BUTTON1 | C22         | 1.8V         |      |
+
+### 7.3 编码开关
+
+板卡设计有4个微型拨码开关，连接在PL端，FPGA一侧的的IO电压为1.8V  。
+
+![](image/image-20240512152911996.png)
+
+**编码开关的引脚分配如下：**
+
+| 信号名称   | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注 |
+| ---------- | ----------- | ------------ | ---- |
+| PL_DIP_SW0 | C20         | 1.8V         |      |
+| PL_DIP_SW1 | D20         | 1.8V         |      |
+| PL_DIP_SW2 | D22         | 1.8V         |      |
+| PL_DIP_SW3 | E19         | 1.8V         |      |
+
+### 7.4 调试串口
+
+调试串口设计在PL端，连接到FT2232芯片的串口收发引脚上，IO电平为3.3V。
+
+| 信号名称    | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注            |
+| ----------- | ----------- | ------------ | --------------- |
+| PL_UART0_RX | V7          | 3.3V         | ZYNQ_UART的RX端 |
+| PL_UART0_TX | V8          | 3.3V         | ZYNQ_UART的TX端 |
 
 
 
+### 7.5 EEPROM
 
-### 扩展口
+板卡设计有一片 IIC 接口的 EEPROM ，型号为 M24C08-WDW6TP ， 容量为 1Kbytes;
+
+![image-20240512153628256](image/image-20240512153628256.png)
+
+
+
+| 信号名称   | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注 |
+| ---------- | ----------- | ------------ | ---- |
+| EEPROM_SDA | AB14        | 3.3V         |      |
+| EEPROM_SCL | AB15        | 3.3V         |      |
+
+### 7.6 风扇控制
+
+板卡设计有一路风扇控制接口，12V供电，支持PWM风扇调速 。风扇的控制由 ZYNQ 芯片来控制，控制管脚连接到 FPGA的 IO ，如果 IO 电平输出为高，MOSFET 管导通，风扇工作，如果 IO 电平输出为低，风扇停止。板上的风扇设计图如下图 所示:
+
+<img src="image/image-20240512153716455.png" alt="image-20240512153716455" style="zoom:67%;" />
+
+| 信号名称    | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注              |
+| ----------- | ----------- | ------------ | ----------------- |
+| FAN_PWM_3V3 | W5          | 3.3V         | 风扇控制，PWM信号 |
+
+### 7.7 OLED接口
+
+板卡设计有OLCD屏幕接口，采用IIC接口，支持简单内容的显示。采用4PIN 2.54间距的单排排针，包括3.3V供电，地，SDA，SCL信号 。
+
+![image-20240512154648375](image/image-20240512154648375.png)
+
+| 信号名称   | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注 |
+| ---------- | ----------- | ------------ | ---- |
+| EEPROM_SDA | AB14        | 1.8V         |      |
+| EEPROM_SCL | AB15        | 1.8V         |      |
+
+### 7.8 温度传感器
+
+板卡设计有一片IIC接口的温度传感器芯片，可用于检测环境温度。
+
+![image-20240512155557873](image/image-20240512155557873.png)
+
+| 信号名称 | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注 |
+| -------- | ----------- | ------------ | ---- |
+| SDA_TEM  | V22         | 3.3V         |      |
+| SCL_TEM  | W22         | 3.3V         |      |
+
+### 7.9 HDMI
+
+板卡设计有一路 HDMI 图像视频输出接口, 能实现 1080P 的视频图像传输；开发板上通过 FPGA 的差分 IO直接连接到 HDMI 接口的差分信号和时钟，在 FPGA 内部实现 HMDI 信号的差分转并行再进行编解码，实现 DMI 数字视频输入和输出的传输解决方案，最高支持 1080P@60Hz 的输入和输出的功能。
+
+板卡上采用 TPD12S016RKTR 芯片作为HDMI的接口防护芯片 。TPD12S016 是一款单芯片高清多媒体接口 (HDMI) 器件，具有自动方向感应 I2C 电压电平转换缓冲器、负载开关和集成式低电容高速静电放电 (ESD) 瞬态电压抑制 (TVS) 保护二极管。通过 55mA 限流 5V 输出 (5V_OUT) 为 HDMI 电力线供电。5V_OUT 和热插拔检测 (HPD) 电路的控制与 LS_OE 控制信号无关，其通过 CT_HPD 引脚进行控制，使得在启用 HDMI 链路前即可激活检测方案（5V_OUT 和 HPD）。SDA、SCL 和 CEC 线路上拉到 A 侧的 VCCA。在 B 侧，CEC_B 引脚上拉到内部 3.3V 电源轨，SCL_B 和 SDA_B 均上拉到 5V 电源轨 (5V_OUT)。SCL 和 SDA 引脚满足 I2C 规范，可驱动高达 750pF 电容负载，超出了 HDMI 1.4 规范。HPD_B 端口配有毛刺脉冲滤波器，可在插入 HDMI 连接器时避免由插座跳起引起的错误检测。TPD12S016 的 5V_OUT 引脚具有反向电流阻断功能。系统断电时，SCL_B、SDA_B 和 CEC_B 引脚也具有反向电流阻断功能。
+
+
+
+![image-20240512155857813](image/image-20240512155857813.png)
+
+![image-20240512160004849](image/image-20240512160004849.png)
+
+HDMI接口的引脚定义如下 ：
+
+| 信号名称     | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注 |
+| ------------ | ----------- | ------------ | ---- |
+| HDMI_CLK_P   | L18         | 3.3V         |      |
+| HDMI_CLK_N   | L19         | 3.3V         |      |
+| HDMI_DATA_P0 | M15         | 3.3V         |      |
+| HDMI_DATA_N0 | M16         | 3.3V         |      |
+| HDMI_DATA_P1 | J15         | 3.3V         |      |
+| HDMI_DATA_N1 | K15         | 3.3V         |      |
+| HDMI_DATA_P2 | K16         | 3.3V         |      |
+| HDMI_DATA_N2 | L16         | 3.3V         |      |
+| HDMI_LOS_CE  | P16         | 3.3V         |      |
+| HDMI_CT_HPD  | H15         | 3.3V         |      |
+| HDMI_HPD     | P15         | 3.3V         |      |
+| HDMI_SCL_3V3 | R16         | 3.3V         |      |
+| HDMI_SDA_3V3 | R15         | 3.3V         |      |
+| HDMI_CEC     | N15         | 3.3V         |      |
+
+### 7.10 RGB_LCD
+
+板卡设计有LCD屏幕接口，采用RGB888时序接口，支持显示屏幕以及触摸功能 。采用FPC连接器和屏幕相连接，FPC引脚定义兼容正点原子的LCD RGB屏幕接口，用户可自行购买正点原子的RGB LCD显示屏幕进行开发调试 。
+
+![image-20240512160441185](image/image-20240512160441185.png)
+
+RGB_LCD接口的引脚定义如下 ：
+
+| 信号名称  | ZYNQ 引脚号 | ZYNQ IO 电平 | 备注                            |
+| --------- | ----------- | ------------ | ------------------------------- |
+| LCD_R0    | W21         | 3.3V         | 8 位 RED 数据线0                |
+| LCD_R1    | V20         | 3.3V         | 8 位 RED 数据线1                |
+| LCD_R2    | AB22        | 3.3V         | 8 位 RED 数据线2                |
+| LCD_R3    | W20         | 3.3V         | 8 位 RED 数据线3                |
+| LCD_R4    | AB21        | 3.3V         | 8 位 RED 数据线4                |
+| LCD_R5    | AA22        | 3.3V         | 8 位 RED 数据线5                |
+| LCD_R6    | Y21         | 3.3V         | 8 位 RED 数据线6                |
+| LCD_R7    | AA21        | 3.3V         | 8 位 RED 数据线7                |
+| LCD_G0    | Y20         | 3.3V         | 8 位 GREEN 数据线0              |
+| LCD_G1    | AB20        | 3.3V         | 8 位 GREEN 数据线1              |
+| LCD_G2    | V18         | 3.3V         | 8 位 GREEN 数据线2              |
+| LCD_G3    | AA18        | 3.3V         | 8 位 GREEN 数据线3              |
+| LCD_G4    | AB17        | 3.3V         | 8 位 GREEN 数据线4              |
+| LCD_G5    | AA17        | 3.3V         | 8 位 GREEN 数据线5              |
+| LCD_G6    | AB16        | 3.3V         | 8 位 GREEN 数据线6              |
+| LCD_G7    | AA16        | 3.3V         | 8 位 GREEN 数据线7              |
+| LCD_B0    | Y16         | 3.3V         | 8 位 BLUE 数据线0               |
+| LCD_B1    | Y15         | 3.3V         | 8 位 BLUE 数据线1               |
+| LCD_B2    | U21         | 3.3V         | 8 位 BLUE 数据线2               |
+| LCD_B3    | U20         | 3.3V         | 8 位 BLUE 数据线3               |
+| LCD_B4    | U19         | 3.3V         | 8 位 BLUE 数据线4               |
+| LCD_B5    | V19         | 3.3V         | 8 位 BLUE 数据线5               |
+| LCD_B6    | Y18         | 3.3V         | 8 位 BLUE 数据线6               |
+| LCD_B7    | V17         | 3.3V         | 8 位 BLUE 数据线7               |
+| LCD_CLK   | W16         | 3.3V         | 像素时钟。                      |
+| LCD_HSYNC | W15         | 3.3V         | 水平同步信号。                  |
+| LCD_VSYNC | AA14        | 3.3V         | 垂直同步信号。                  |
+| LCD_DE    | Y14         | 3.3V         | 数据使能信号。                  |
+| LCD_BL    | V15         | 3.3V         | 背光控制信号。                  |
+| LCD_RESET | U16         | 3.3V         | LCD 复位信号（低电平有效）      |
+| TP_CS     | U22         | 3.3V         | 电容触摸屏复位信号(CT_RST)      |
+| TP_MOSI   | U17         | 3.3V         | 电容触摸屏 IIC_SDA 信号(CT_SDA) |
+| TP_MISO   | T21         | 3.3V         | NC，电容触摸屏未用到            |
+| TP_SCK    | V13         | 3.3V         | 电容触摸屏 IIC_SCL 信号(CT_SCL) |
+| TP_PEN    | T22         | 3.3V         | 电容触摸屏中断信号(CT_INT)      |
+
+### 7.11 扩展口
 
 扩展口 J2 和J30J均为 40 管脚的 2.54mm 的双排连接器，为用户扩展更多的外设和接口，扩展口上包含 5V 电源 1 路，3.3V 电源 2 路，地 3 路，IO 口 34 路。IO 口的信号连接到 ZYNQ PL 的 BANK13 和 BANK34 上，电平为 3.3V。
 
@@ -534,3 +716,4 @@ ESD防护芯片具有静电和浪涌保护功能，选用型号为：RCLAMP0524P
 | PIN40  |  VCC3V3  |     -      |     -      | 3.3V电源输出         |
 
 ## 8，板卡接口汇总
+
