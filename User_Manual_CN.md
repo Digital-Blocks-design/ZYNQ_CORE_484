@@ -1,6 +1,20 @@
 ## 0，文档管理
 
-此文档由【数字积木】编写 。本文档采用git工具进行管理，文档托管地址为  https://github.com/Digital-Blocks-design/ZYNQ_CORE_484 ，访问该地址，查看最新版的文档信息。如在阅读使用过程中发现文档内容描述有误，欢迎在github上提交 issue （issue链接 ：https://github.com/Digital-Blocks-design/ZYNQ_CORE_484/issues）， 或直接联系作者本人  ，作者联系方式如下 ：
+此文档由【数字积木】编写 。本文档采用git工具进行管理，文档托管地址为
+
+Github :  https://github.com/Digital-Blocks-design/ZYNQ_CORE_484 
+
+Gitee加速访问 ：https://gitee.com/gongwenhong/ZYNQ_CORE_484
+
+【注】Gitee和Github同步更新 。
+
+访问该地址，查看最新版的文档信息。
+
+如在阅读使用过程中发现文档内容描述有误，欢迎在Github 上提交 issue （issue链接 ：
+
+https://github.com/Digital-Blocks-design/ZYNQ_CORE_484/issues
+
+或直接联系作者本人  ，作者联系方式如下 ：
 
 邮箱：digital_blocks@163.com ，
 
@@ -787,7 +801,7 @@ ESD防护芯片具有静电和浪涌保护功能，选用型号为：RCLAMP0524P
 
 
 
-### 9.3 github
+### 9.3 Github 
 
 数字积木github主页链接如下：
 
