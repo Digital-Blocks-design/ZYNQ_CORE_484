@@ -18,6 +18,10 @@ https://github.com/Digital-Blocks-design/ZYNQ_CORE_484/issues
 
 邮箱：digital_blocks@163.com ，
 
+【FPGA_ZYNQ交流1群】 ：810689010
+
+【FPGA_ZYNQ交流2群】 ：606727905
+
 QQ号：1455117034  。
 
 ## 1，板卡概述
@@ -793,11 +797,11 @@ ESD防护芯片具有静电和浪涌保护功能，选用型号为：RCLAMP0524P
 
 ### 9.2 QQ群
 
-【FPGA_ZYNQ】交流1群 ：810689010
+【FPGA_ZYNQ交流1群】 ：810689010
 
-【FPGA_ZYNQ】交流2群 ：606727905
+【FPGA_ZYNQ交流2群】 ：606727905
 
-如无法加群，可添加标注个人QQ号 ： 1455117034
+如无法加群，可添加个人QQ号 ： 1455117034
 
 
 
