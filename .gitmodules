@@ -1,0 +1,3 @@
+[submodule "open_jtag_smt3"]
+	path = open_jtag_smt3
+	url = https://github.com/Digital-Blocks-design/open_jtag_smt3.git
