@@ -1,1 +1,17 @@
 /*.bkp
+
+
+.Xil
+*.cache
+*.gen
+*.hw
+*.ip_user_files
+*.runs
+*.sim
+*.jou
+*.log
+*.dcp
+
+.metadata
+.sdk
+webtalk
