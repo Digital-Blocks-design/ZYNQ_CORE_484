@@ -16,8 +16,10 @@
 5，能在主流媒体博客上发表最佳 。
 6，试用报告形式：标题格式 【数字积木ZYNQ核心板体验】+ 自拟标题
 
-实验报告参考模板
+**实验报告参考模板**
+
 https://bbs.elecfans.com/jishu_2312678_1_1.html
+
 https://bbs.elecfans.com/jishu_2319928_1_1.html
 
 
