@@ -1,3 +1,13 @@
+## 【注意-20240820】
+
+该仓库已被弃用，仅作为遗留备份仓库 ，后续将不再更新 。
+
+ ZYNQ_CORE_484 板卡 和  ZYNQ_CORE_400 板卡 的相关资料信息将在新仓库更新 。 新仓库的链接如下 ：
+
+Github :  https://github.com/Digital-Blocks-design/ZYNQ_CORE
+
+
+
 本项目用于记录 ZYNQ_CORE_484 板卡的相关信息 。
 
 包括硬件介绍 ，开发例程等等 。
